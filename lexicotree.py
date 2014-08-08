@@ -4,7 +4,7 @@ from types import IntType, DictType, ListType, TupleType
 class LexicoTree (object):
    '''
       Tree-like data structure with property of lexical ordering. This is most useful for optimizing Apriori-like
-      routines and  algorithms e.g. for mining frequent or maximal itemsets where combinatorial generation is too
+      routines and  algorithms e.g. for mining frequent or maximal itemsets where combinatorial subset generation is too
       expensive for long itemsets.
 
       Each leaf nodes of the tree is an itemset. Each item in the itemset has a user defined weight which affects ordering.
