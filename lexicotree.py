@@ -3,13 +3,13 @@ from types import IntType, DictType, ListType, TupleType
 
 class LexicoTree (object):
    '''
-      Tree-like data structure with property of lexical ordering. This is most useful for optimizing Apriori-like
+      Tree-like data structure with property of lexicographic ordering. This is most useful for optimizing Apriori-like
       routines and  algorithms e.g. for mining frequent or maximal itemsets where combinatorial subset generation is too
       expensive for long itemsets.
 
       Each leaf nodes of the tree is guarnateed to be a transaction. However, not all transations are guaranteed to be leaf
-      nodes, indeed any node in the tree can potentially be a transaction. Lexical ordering provides an efficient way to
-      enumerate subsets (parents can be considered subsets of their children) Each item in the itemset has a user defined
+      nodes, indeed any node in the tree can potentially be a transaction. Lexicographic ordering provides an efficient way
+      to enumerate subsets (parents can be considered subsets of their children) Each item in the itemset has a user defined
       weight which affects ordering. Weights can affect lookup performance (by changing the structure of the tree)
 
       Each node in the tree has a 'head' - which is an immutable set of items. Every leaf (L) which is a subnode of a
