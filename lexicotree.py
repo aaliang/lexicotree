@@ -90,6 +90,18 @@ class LexicoNode (object):
 
       return self.children_nodes[child_e]
 
+   def prune (self, child):
+      '''
+         Prunes child from this node
+
+         @type child: frozenset or set
+      '''
+      assert isinstance(child, (set, frozenset))
+      if child in self.children_nodes:
+         del self.children_nodes[child] #so easy with python/gc!
+      else:
+         assert False # this should never happen
+
    __slots__ = (
       'level',
       'head',
