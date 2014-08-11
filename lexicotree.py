@@ -101,11 +101,11 @@ class LexicoNode (object):
 
       self.tail.update(x for x in itemset if x not in self.head)
 
-      child_e = itemset[self.level] #the element in the next level thats augmented to the current level
-      if child_e not in self.children_nodes:
-         new_head = frozenset(self.head.union((child_e,)))
+      #the element in the next level thats augmented to the current level
+      new_head = frozenset(self.head.union((itemset[self.level],)))
+      if new_head not in self.children_nodes:
 
-         self.children_nodes[new_head] =  LexicoNode(level=self.level+1,
+         self.children_nodes[new_head] = LexicoNode(level=self.level+1,
                                head=new_head,
                                tail=set(x for x in itemset if x not in new_head),
                                children_nodes={},
