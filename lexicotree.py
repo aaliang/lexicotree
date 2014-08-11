@@ -51,7 +51,7 @@ class LexicoTree (object):
          @type func: FunctionType
       '''
       assert isinstance(func, FunctionType)
-      
+
       node_queue = deque(v for (c, v) in self.null_node.children_nodes.iteritems())
       while (len(node_queue) > 0):
          el = node_queue.popleft()
@@ -105,13 +105,13 @@ class LexicoNode (object):
       if child_e not in self.children_nodes:
          new_head = frozenset(self.head.union((child_e,)))
 
-         self.children_nodes[child_e] =  LexicoNode(level=self.level+1,
+         self.children_nodes[new_head] =  LexicoNode(level=self.level+1,
                                head=new_head,
                                tail=set(x for x in itemset if x not in new_head),
                                children_nodes={},
                                parent_node=self)
 
-      return self.children_nodes[child_e]
+      return self.children_nodes[new_head]
 
    def prune (self, child):
       '''
