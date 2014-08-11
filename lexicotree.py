@@ -1,5 +1,5 @@
 from collections import Counter, deque
-from types import IntType, DictType, ListType, TupleType
+from types import IntType, DictType, ListType, TupleType, FunctionType
 
 class LexicoTree (object):
    '''
@@ -45,6 +45,13 @@ class LexicoTree (object):
 
 
    def traverse_breadth_first (self, func):
+      '''
+         Applies L{func} to every node in the tree, except for L{self.null_node}
+
+         @type func: FunctionType
+      '''
+      assert isinstance(func, FunctionType)
+      
       node_queue = deque(v for (c, v) in self.null_node.children_nodes.iteritems())
       while (len(node_queue) > 0):
          el = node_queue.popleft()
