@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, deque
 from types import IntType, DictType, ListType, TupleType
 
 class LexicoTree (object):
@@ -43,6 +43,15 @@ class LexicoTree (object):
       for x in xrange(len(itemset)):
          node = node.branch(itemset)
 
+
+   def traverse_breadth_first (self, func):
+      node_queue = deque(v for (c, v) in self.null_node.children_nodes.iteritems())
+      while (len(node_queue) > 0):
+         el = node_queue.popleft()
+         func(el)
+         node_queue.extend(v for c, v in el.children_nodes.iteritems())
+
+
    __slots__ = ('rankings',
                 'values',
                 'null_node')
@@ -66,6 +75,10 @@ class LexicoNode (object):
       self.tail = tail
       self.children_nodes = children_nodes
       self.parent_node = parent_node
+
+   def __repr__(self):
+      return ','.join(str(e) for e in self.head)
+
 
    def branch(self, itemset):
       '''
@@ -92,6 +105,9 @@ class LexicoNode (object):
                                parent_node=self)
 
       return self.children_nodes[child_e]
+
+   # def bfs_traverse(self, node_queue):
+   #    node_queue.extend()
 
    def prune (self, child):
       '''
@@ -132,3 +148,8 @@ if __name__ == "__main__":
    rankings_dict = dict((v, i) for i,(v,_) in enumerate(cnt.most_common()))
 
    lt = LexicoTree(tweets_as_tokens, rankings_dict)
+
+   def pr (x):
+      print ','.join(str(e) for e in x.head)
+
+   lt.traverse_breadth_first(pr)
