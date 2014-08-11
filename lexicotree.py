@@ -3,7 +3,7 @@ from types import IntType, DictType, ListType, TupleType
 
 class LexicoTree (object):
    '''
-      Tree-like data structure with property of lexicographic ordering. This is most useful for optimizing Apriori-like
+      Tree-like data structure with property of lexicographic ordering, a version of a hash tree. This is most useful for optimizing Apriori-like
       routines and  algorithms e.g. for mining frequent or maximal itemsets where combinatorial subset generation is too
       expensive for long itemsets.
 
