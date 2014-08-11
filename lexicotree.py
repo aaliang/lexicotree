@@ -106,9 +106,6 @@ class LexicoNode (object):
 
       return self.children_nodes[child_e]
 
-   # def bfs_traverse(self, node_queue):
-   #    node_queue.extend()
-
    def prune (self, child):
       '''
          Prunes child from this node
