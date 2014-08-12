@@ -46,12 +46,13 @@ class LexicoTree (object):
 
    def traverse_breadth_first (self, func):
       '''
-         Applies L{func} to every node in the tree, except for L{self.null_node}
+         Applies L{func} to every node in the tree
 
          @type func: FunctionType
       '''
       assert isinstance(func, FunctionType)
 
+      func(self.null_node) #explicitly call it on the null_node
       node_queue = deque(v for (c, v) in self.null_node.children_nodes.iteritems())
       while (len(node_queue) > 0):
          el = node_queue.popleft()
