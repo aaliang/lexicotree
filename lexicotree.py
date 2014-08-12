@@ -37,7 +37,7 @@ class LexicoTree (object):
       #sort the value to a list, and pass it to null_node.branch
       itemset = sorted( raw_value,
                         key=self.rankings.get,
-                        reverse=False)
+                        reverse=True)
 
       node = self.null_node
       for x in xrange(len(itemset)):
