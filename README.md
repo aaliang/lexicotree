@@ -1,5 +1,6 @@
-Tree-like data structure with property of lexicographic ordering, a version of a hash tree. This is most useful for modeling sets and their subsets when optimizing Apriori-like routines and  algorithms e.g. for mining frequent or maximal itemsets where combinatorial subset generation is too
-expensive for long itemsets.
+Tree-like data structure with property of lexicographic ordering, a version of a hash tree. This is most useful for
+optimizing routines for mining frequent itemsets/maximal itemsets in algorithms such as FP-Growth where combinatorial
+subset generation is too expensive for long itemsets.
 
 Each leaf nodes of the tree is guarnateed to be a transaction. However, not all transations are guaranteed to be leaf
 nodes, indeed any node in the tree can potentially be a transaction. Lexicographic ordering provides an efficient way

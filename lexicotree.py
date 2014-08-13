@@ -3,9 +3,9 @@ from types import IntType, DictType, ListType, TupleType, FunctionType
 
 class LexicoTree (object):
    '''
-      Tree-like data structure with property of lexicographic ordering, a version of a hash tree. This is most useful for optimizing Apriori-like
-      routines and  algorithms e.g. for mining frequent or maximal itemsets where combinatorial subset generation is too
-      expensive for long itemsets.
+      Tree-like data structure with property of lexicographic ordering, a version of a hash tree. This is most useful for
+      optimizing routines for mining frequent itemsets/maximal itemsets in algorithms such as FP-Growth where combinatorial
+      subset generation is too expensive for long itemsets.
 
       Each leaf nodes of the tree is guarnateed to be a transaction. However, not all transations are guaranteed to be leaf
       nodes, indeed any node in the tree can potentially be a transaction. Lexicographic ordering provides an efficient way
@@ -19,6 +19,7 @@ class LexicoTree (object):
    '''
 
    def __init__(self, values, rankings):
+      assert isinstance(values, ListType), type (values)
       assert isinstance(rankings, DictType), type(rankings)
 
       self.rankings = rankings
@@ -37,25 +38,48 @@ class LexicoTree (object):
       #sort the value to a list, and pass it to null_node.branch
       itemset = sorted( raw_value,
                         key=self.rankings.get,
-                        reverse=True)
+                        reverse=False)
 
       node = self.null_node
       for x in xrange(len(itemset)):
          node = node.branch(itemset)
 
 
-   def traverse_breadth_first (self, func):
+   def traverse_breadth_first (self, func, initial_node=None):
       '''
-         Applies L{func} to every node in the tree
+         Applies L{func} to every node in the tree, breadth first
 
          @type func: FunctionType
       '''
       assert isinstance(func, FunctionType)
 
-      func(self.null_node) #explicitly call it on the null_node
-      node_queue = deque(v for (c, v) in self.null_node.children_nodes.iteritems())
+      if initial_node is None:
+         initial_node = self.null_node
+      else: assert isinstance(initial_node, LexicoNode)
+
+      func(initial_node) #explicitly call it on the null_node
+      node_queue = deque(v for (c, v) in initial_node.children_nodes.iteritems())
       while (len(node_queue) > 0):
          el = node_queue.popleft()
+         func(el)
+         node_queue.extend(v for c, v in el.children_nodes.iteritems())
+
+   def traverse_depth_first (self, func, initial_node=None):
+      '''
+         Applies L{func} to every node in the tree, depth first
+
+         @type func: FunctionType
+      '''
+      assert isinstance(func, FunctionType)
+
+      if initial_node is None:
+         initial_node = self.null_node
+      else: assert isinstance(initial_node, LexicoNode)
+
+      func(self.null_node)
+      node_queue = deque(v for (c, v) in self.null_node.children_nodes.iteritems())
+      while (len(node_queue) > 0):
+         el = node_queue.pop()
          func(el)
          node_queue.extend(v for c, v in el.children_nodes.iteritems())
 
