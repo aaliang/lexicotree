@@ -36,6 +36,7 @@ class SetEnumNode (object):
 
       self.head = head
       self.tail = tail
+      self.tail_as_set = set(tail)
 
    def gen_sub_nodes (self):
 
@@ -69,4 +70,5 @@ class SetEnumNode (object):
       'level',
       'head',
       'tail',
+      'tail_as_set'
    )

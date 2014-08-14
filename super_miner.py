@@ -52,19 +52,25 @@ ln = defaultdict(list)
 lx = 2
 
 while et.leafs:
-   pruned_list = []
+   # pruned_list = []
    #anchored by suffix
    pruned_dict = defaultdict(list)
    for i, x in enumerate(reversed(et.leafs)):
-      freq = sum(1 for t in tweets_as_tokens if frozenset(x.head).issubset(t))
+      xhead = frozenset(x.head)
+      freq = sum(1 for t in tweets_as_tokens if xhead.issubset(t))
       if (freq >= MIN_SUPP):
          ln[lx].append((x.head, freq))
          # check the pruned_list yo, and subprune your tail
-         xhead = frozenset(x.head) #we don't actually need to frozenset these... as long as they are the same except for one
-         for pruned in pruned_list:
-            if pruned[1] in x.tail and pruned[0].issubset(xhead):
-            # if pruned[0].issubset(xhead) and pruned[1] in x.tail:
-               x.tail = tuple(v for v in x.tail if v != pruned[1])
+         if x.tail:
+            for pruned_tail_candidate, v in pruned_dict.iteritems():
+               # if pruned_tail_candidate in reversed(x.tail):
+               if pruned_tail_candidate in x.tail_as_set:
+                  for t in v:
+                     if t.issubset(xhead):
+                        x.tail_as_set.remove(pruned_tail_candidate)
+                        x.tail = tuple(xt for xt in x.tail_as_set)
+                        # x.tail_as_fset = frozenset(x.tail)
+                        break
                if not x.tail:
                   break
 
@@ -72,8 +78,6 @@ while et.leafs:
       else:
          #pseudo-prune
                               #prefix   , suffix
-         pruned_list.append((frozenset(x.head[:-1]), x.head[-1]))
-
          pruned_dict[x.head[-1]].append(frozenset(x.head[:-1]))
          del et.leafs[x]
 
