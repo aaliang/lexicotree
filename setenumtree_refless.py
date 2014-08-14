@@ -1,6 +1,5 @@
-from types import DictType, IntType, ListType, TupleType, FunctionType
-from collections import deque
-import operator
+from collections import OrderedDict
+
 
 #TODO: maybe use OO with the other tree types...
 class SetEnumTreeRefless (object):
@@ -17,13 +16,12 @@ class SetEnumTreeRefless (object):
       self.rankings = rankings
       self.ranklist = tuple(sorted(items, key=lambda x: rankings[x]))
 
-      self.leafs = set(null_node.gen_sub_nodes())
+      self.leafs = OrderedDict((x, None) for x in null_node.gen_sub_nodes())
 
    def grow (self):
-      new_leafs = set()
+      new_leafs = OrderedDict()
       for x in self.leafs:
-         # new_leafs.update(node for node in x.gen_sub_nodes())
-         new_leafs.update(x.gen_sub_nodes())
+         new_leafs.update((y, None) for y in x.gen_sub_nodes())
 
       self.leafs = new_leafs
       print 'len(self.leafs): %s' % len(self.leafs)

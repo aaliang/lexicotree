@@ -28,7 +28,11 @@ def get_counter (token_set_list, support):
 tweets = prep_statuses(statuses)
 #tokenize and filter out the retweets
 
-tweets_as_tokens = filter(lambda z: 'rt' not in z, [set([y.lower() for y in x]) for x in tweets])
+STOP_WORDS = frozenset(('a', 'an', 'the', 'of', 'i', 'me', 'rt', 'to', '#tvtag', 'my', 'realhughjackman'))
+
+
+tweets_as_tokens = filter(lambda z: 'rt' not in z, [set([y.lower() for y in x if y.lower() not in STOP_WORDS]) for x in tweets])
+
 
 MIN_SUPP = int(MIN_FREQ * len(tweets_as_tokens))
 cnt = get_counter (tweets_as_tokens, MIN_SUPP)
@@ -38,22 +42,44 @@ tweets_as_tokens = [set(x for x in t if x in cnt) for t in tweets_as_tokens]
 rankings_dict = dict((v, i) for i,(v,_) in enumerate(cnt.most_common()))
 # lt = LexicoTree(tweets_as_tokens, rankings_dict)
 
+
+# et = SetEnumTreeRefless({1: 0, 2:1, 3:2, 4:3, 5:4}, [1, 2, 3, 4, 5])
 et = SetEnumTreeRefless(rankings_dict, rankings_dict.keys())
 #lets assume we know the one world common tokens for now
 et.grow()
 
 ln = defaultdict(list)
+lx = 2
+
 while et.leafs:
-   for x in list(et.leafs):
+   pruned_list = []
+   #anchored by suffix
+   pruned_dict = defaultdict(list)
+   for i, x in enumerate(reversed(et.leafs)):
       freq = sum(1 for t in tweets_as_tokens if frozenset(x.head).issubset(t))
       if (freq >= MIN_SUPP):
-         ln[len(x.head)].append((x.head, freq))
-         # ln.append((x.head, freq))
+         ln[lx].append((x.head, freq))
+         # check the pruned_list yo, and subprune your tail
+         xhead = frozenset(x.head) #we don't actually need to frozenset these... as long as they are the same except for one
+         for pruned in pruned_list:
+            if pruned[1] in x.tail and pruned[0].issubset(xhead):
+            # if pruned[0].issubset(xhead) and pruned[1] in x.tail:
+               x.tail = tuple(v for v in x.tail if v != pruned[1])
+               if not x.tail:
+                  break
+
          # print "%s - f{%s}" % (x.head, freq)
       else:
          #pseudo-prune
-         et.leafs.remove(x)
+                              #prefix   , suffix
+         pruned_list.append((frozenset(x.head[:-1]), x.head[-1]))
+
+         pruned_dict[x.head[-1]].append(frozenset(x.head[:-1]))
+         del et.leafs[x]
+
+
    et.grow()
+   lx += 1
 
 for k in ln:
    print '\nitemsets of length %s' % k
