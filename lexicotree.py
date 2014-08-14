@@ -41,8 +41,10 @@ class LexicoTree (object):
                         reverse=False)
 
       node = self.null_node
+      node.frequency_count += 1
       for x in xrange(len(itemset)):
          node = node.branch(itemset)
+         node.frequency_count += 1
 
 
    def traverse_breadth_first (self, func, initial_node=None):
@@ -107,6 +109,7 @@ class LexicoNode (object):
       self.tail = tail
       self.children_nodes = children_nodes
       self.parent_node = parent_node
+      self.frequency_count = 0
 
    def __repr__(self):
       return ','.join(str(e) for e in self.head)
@@ -155,7 +158,8 @@ class LexicoNode (object):
       'head',
       'tail',
       'children_nodes',
-      'parent_node'
+      'parent_node',
+      'frequency_count'
    )
 
 #implementation example, more to come later
