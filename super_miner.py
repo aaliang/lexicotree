@@ -1,4 +1,4 @@
-# from setenumtree import SetEnumTree
+# frequent itemset miner script. may be hard to follow, i'll break it up someday
 from setenumtree_refless import SetEnumTreeRefless
 from collections import Counter, defaultdict, deque
 import re
