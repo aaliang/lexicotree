@@ -1,6 +1,4 @@
-# frequent itemset miner script. may be hard to follow, i'll break it up someday
-# pypy compatible
-
+# from setenumtree import SetEnumTree
 from setenumtree_refless import SetEnumTreeRefless
 from collections import Counter, defaultdict, deque
 import re
@@ -8,14 +6,14 @@ import sys
 import json
 
 #after each tail pass, it will prune out unused db transactions
-
+FILE = sys.argv[1]
 MIN_FREQ = float(sys.argv[2])
 
 #lol, do this for now
 try: #twitter
-   statuses = json.load(open(sys.argv[1]))['statuses']
+   statuses = json.load(open(FILE))['statuses']
 except: #instagram
-   statuses = [x['caption'] for x in json.load(open(sys.argv[1])) if x['caption']]
+   statuses = [x['caption'] for x in json.load(open(FILE)) if x['caption']]
 
 def prep_statuses (statuses):
    #strip out non alphanumeric characters and/or spaces
@@ -33,9 +31,9 @@ def get_counter (token_set_list, support):
 tweets = prep_statuses(statuses)
 #tokenize and filter out the retweets
 
-STOP_WORDS = frozenset(('a', 'an', 'the', 'of', 'i', 'me', 'rt', 'to', '#tvtag', 'my', 'realhughjackman'))
+#if you want retweets, add 'rt' to this frozenset
+STOP_WORDS = frozenset(('a', 'an', 'the', 'of', 'i', 'me', 'to', '#tvtag', 'my', 'realhughjackman'))
 
-# tweets_as_tokens = filter(lambda z: 'rt' not in z, [set([y.lower() for y in x if y.lower() not in STOP_WORDS]) for x in tweets])
 tweets_as_tokens = filter(lambda z: 'rt' not in z, [set([y.lower() for y in x if y.lower() not in STOP_WORDS]) for x in tweets])
 
 len_tweets = len(tweets_as_tokens)
@@ -45,7 +43,6 @@ print 'MIN_SUPP = %s' % MIN_SUPP
 cnt = get_counter (tweets_as_tokens, MIN_SUPP)
 
 tweets_as_tokens = list(Counter(frozenset(x for x in t if x in cnt) for t in tweets_as_tokens).iteritems())
-# tweets_as_tokens = list[ for x in Counter(frozenset(x for x in t if x in cnt) for t in tweets_as_tokens)]
 
 rankings_dict = dict((v, i) for i,(v,_) in enumerate(cnt.most_common()))
 # lt = LexicoTree(tweets_as_tokens, rankings_dict)
@@ -93,7 +90,6 @@ while et.leafs:
          # check the pruned_list yo, and subprune your tail
          if x.tail:
             for pruned_tail_candidate, v in pd_iteritems():
-               # if pruned_tail_candidate in reversed(x.tail):
                if pruned_tail_candidate in x.tail_as_set:
                   for t in v:
                      if is_subset(t, xhead):
