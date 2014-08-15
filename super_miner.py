@@ -1,4 +1,6 @@
 # frequent itemset miner script. may be hard to follow, i'll break it up someday
+# pypy compatible
+
 from setenumtree_refless import SetEnumTreeRefless
 from collections import Counter, defaultdict, deque
 import re
