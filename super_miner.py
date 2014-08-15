@@ -1,9 +1,11 @@
-from setenumtree import SetEnumTree
+# from setenumtree import SetEnumTree
 from setenumtree_refless import SetEnumTreeRefless
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 import re
 import sys
 import json
+
+#after each tail pass, it will prune out unused db transactions
 
 MIN_FREQ = float(sys.argv[2])
 
@@ -25,23 +27,26 @@ def get_counter (token_set_list, support):
       c.update(token_set)
    #filter out things under a certain support -> this step may not even be necessary
    return Counter(dict((x, c[x]) for x in c if c[x] >= support))
+
 tweets = prep_statuses(statuses)
 #tokenize and filter out the retweets
 
 STOP_WORDS = frozenset(('a', 'an', 'the', 'of', 'i', 'me', 'rt', 'to', '#tvtag', 'my', 'realhughjackman'))
 
-
+# tweets_as_tokens = filter(lambda z: 'rt' not in z, [set([y.lower() for y in x if y.lower() not in STOP_WORDS]) for x in tweets])
 tweets_as_tokens = filter(lambda z: 'rt' not in z, [set([y.lower() for y in x if y.lower() not in STOP_WORDS]) for x in tweets])
 
+len_tweets = len(tweets_as_tokens)
+MIN_SUPP = int(MIN_FREQ * len_tweets)
 
-MIN_SUPP = int(MIN_FREQ * len(tweets_as_tokens))
+print 'MIN_SUPP = %s' % MIN_SUPP
 cnt = get_counter (tweets_as_tokens, MIN_SUPP)
 
-tweets_as_tokens = [set(x for x in t if x in cnt) for t in tweets_as_tokens]
+tweets_as_tokens = list(Counter(frozenset(x for x in t if x in cnt) for t in tweets_as_tokens).iteritems())
+# tweets_as_tokens = list[ for x in Counter(frozenset(x for x in t if x in cnt) for t in tweets_as_tokens)]
 
 rankings_dict = dict((v, i) for i,(v,_) in enumerate(cnt.most_common()))
 # lt = LexicoTree(tweets_as_tokens, rankings_dict)
-
 
 # et = SetEnumTreeRefless({1: 0, 2:1, 3:2, 4:3, 5:4}, [1, 2, 3, 4, 5])
 et = SetEnumTreeRefless(rankings_dict, rankings_dict.keys())
@@ -49,27 +54,49 @@ et = SetEnumTreeRefless(rankings_dict, rankings_dict.keys())
 et.grow()
 
 ln = defaultdict(list)
-lx = 2
+pruned_dict = defaultdict(list)
 
+#func vars to avoid dotting in a tight loop
+is_subset = frozenset.issubset
+list_append = list.append
+
+pd_iteritems = pruned_dict.iteritems
+
+freq_deque = deque()
+freq_deque_clear = freq_deque.clear
+freq_deque_extend = freq_deque.extend
+#token instances (counted by sum)
+
+freq_set = set()
+freq_set_update = freq_set.update
+freq_set_clear = freq_set.clear
+#misnamed set for checking if transaction is still relevant
+
+print 'len(freq_set) = %s' % len(tweets_as_tokens)
+
+lx = 2
 while et.leafs:
-   # pruned_list = []
-   #anchored by suffix
-   pruned_dict = defaultdict(list)
    for i, x in enumerate(reversed(et.leafs)):
       xhead = frozenset(x.head)
-      freq = sum(1 for t in tweets_as_tokens if xhead.issubset(t))
+
+      freq_deque_extend(t for t in tweets_as_tokens if is_subset(xhead, t[0]))
+
+      freq = sum(f[1] for f in freq_deque)
+
       if (freq >= MIN_SUPP):
-         ln[lx].append((x.head, freq))
+         list_append(ln[lx], (x.head, freq))
+
+         freq_set_update(freq_deque)
+
          # check the pruned_list yo, and subprune your tail
          if x.tail:
-            for pruned_tail_candidate, v in pruned_dict.iteritems():
+            for pruned_tail_candidate, v in pd_iteritems():
                # if pruned_tail_candidate in reversed(x.tail):
                if pruned_tail_candidate in x.tail_as_set:
                   for t in v:
-                     if t.issubset(xhead):
+                     if is_subset(t, xhead):
                         x.tail_as_set.remove(pruned_tail_candidate)
-                        x.tail = tuple(xt for xt in x.tail_as_set)
-                        # x.tail_as_fset = frozenset(x.tail)
+                        x.tail = tuple(x.tail_as_set)
                         break
                if not x.tail:
                   break
@@ -78,17 +105,26 @@ while et.leafs:
       else:
          #pseudo-prune
                               #prefix   , suffix
-         pruned_dict[x.head[-1]].append(frozenset(x.head[:-1]))
+         list_append(pruned_dict[x.head[-1]], frozenset(x.head[:-1]))
          del et.leafs[x]
 
+      freq_deque_clear()
 
+   pruned_dict.clear()
+
+   print 'len(freq_set) = %s' % len(freq_set)
+   tweets_as_tokens = list(freq_set)
+
+   freq_set_clear()
    et.grow()
+
+   # print 'len(vset) = %s' %len(vset)
    lx += 1
 
 for k in ln:
    print '\nitemsets of length %s' % k
    sorted_l = sorted(ln[k], key=lambda tup: tup[1])
    for i, f in sorted_l:
-      print str(i) + '   f{%s}  =>  %.3f%%'% (f, float(f)*100/len(tweets_as_tokens))
+      print str(i) + '   f{%s}  =>  %.3f%%'% (f, float(f)*100/len_tweets)
 
-print len(tweets_as_tokens)
+print len_tweets
