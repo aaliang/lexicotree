@@ -20,8 +20,19 @@ class SetEnumTreeRefless (object):
 
    def grow (self):
       new_leafs = OrderedDict()
+
       for x in self.leafs:
          new_leafs.update((y, None) for y in x.gen_sub_nodes())
+
+      self.leafs = new_leafs
+      print 'len(self.leafs): %s' % len(self.leafs)
+
+   #deprecate me
+   def grow_s(self, acceptable_tokens):
+
+      new_leafs = OrderedDict()
+      for x in self.leafs:
+         new_leafs.update((y, None) for y in x.gen_sub_nodes_special(acceptable_tokens))
 
       self.leafs = new_leafs
       print 'len(self.leafs): %s' % len(self.leafs)
@@ -42,7 +53,7 @@ class SetEnumNode (object):
 
       new_nodes = []
       for i, x in enumerate(self.tail):
-         assert x not in self.head
+         # assert x not in self.head
          new_child_head = self.head + (x, )
          new_child = SetEnumNode(head=new_child_head,
                                  tail=self.tail[i+1::],
@@ -51,6 +62,25 @@ class SetEnumNode (object):
          # yield new_child
 
       return new_nodes
+
+   #deprecate me
+   def gen_sub_nodes_special (self, acceptable_tokens):
+
+      new_nodes = []
+      for i, x in enumerate(self.tail):
+         assert x not in self.head
+         if x in acceptable_tokens:
+            new_child_head = self.head + (x, )
+            new_child = SetEnumNode(head=new_child_head,
+                                    tail=self.tail[i+1::],
+                                    )
+            new_nodes.append(new_child)
+         else:
+            print 'IGNORING'
+         # yield new_child
+
+      return new_nodes
+
 
    #same as above, except this recurses...
    def spawn_children_exhaustive (self, candidates):
