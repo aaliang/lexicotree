@@ -94,7 +94,7 @@ class SetEnumNode (object):
          self.tail.append(x)
          new_candidates = candidates[i+1::]
 
-         new_child.spawn_exhaustive(new_candidates)
+         new_child.spawn_children_exhaustive(new_candidates)
 
    __slots__ = (
       'level',
