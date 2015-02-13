@@ -9,12 +9,10 @@ class SetEnumTreeRefless (object):
       reclaim objects
    '''
 
-   def __init__(self, rankings, items):
+   def __init__(self, items):
       # assert isinstance(rankings, DictType)
 
       null_node = SetEnumNode(head=tuple(), tail=tuple(items))
-      self.rankings = rankings
-      self.ranklist = tuple(sorted(items, key=lambda x: rankings[x]))
 
       self.leafs = OrderedDict((x, None) for x in null_node.gen_sub_nodes())
 
@@ -38,7 +36,7 @@ class SetEnumTreeRefless (object):
       print 'len(self.leafs): %s' % len(self.leafs)
 
    __slots__ = (
-      'rankings', 'ranklist', 'leafs'
+      'leafs'
    )
 
 class SetEnumNode (object):
