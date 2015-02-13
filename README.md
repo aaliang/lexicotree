@@ -22,3 +22,5 @@ There are three flavors in increasing level of optimization:
 3. setenumtreerefless - differs from the above in that:
   - parent nodes of each node of the tree is not maintained
   - as a result, it is not possible to bfs/dfs traverse the entire enumeration from the tree object
+ 
+superminer and superminer_db_compress are heavily optimized apriori variants. the latter is the fastest implementation and should be fully compatible with pypy running python 2.7
