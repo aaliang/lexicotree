@@ -1,6 +1,6 @@
 import scala.collection.JavaConversions._
-//scala translation. disclaimer: have never run it yet and I probably never will considering the SetEnumTree
-//is better in every way
+//scala translation. disclaimer: have never run it yet and I probably never will considering the SetEnumTree(Refless)
+//is better in every way for counting frequent itemsets
 
 class LexicoNode (level: Int,
   head: Set[String],
