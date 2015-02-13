@@ -85,7 +85,7 @@ rankings_dict = dict((v, i) for i,(v,_) in enumerate(cnt.most_common()))
 # lt = LexicoTree(tweets_as_tokens, rankings_dict)
 
 # et = SetEnumTreeRefless({1: 0, 2:1, 3:2, 4:3, 5:4}, [1, 2, 3, 4, 5])
-et = SetEnumTreeRefless(rankings_dict, rankings_dict.keys())
+et = SetEnumTreeRefless(rankings_dict.keys())
 #lets assume we know the one world common tokens for now
 et.grow()
 
